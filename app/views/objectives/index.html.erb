@@ -1,0 +1,9 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Objectives</h1>
+<%= link_to 'New Objective', new_objective_path %>
+<hr />
+
+<%= tag.div id: :boards, data: { objectives: @objectives.to_json(include: :tasks) } %>
+
+
