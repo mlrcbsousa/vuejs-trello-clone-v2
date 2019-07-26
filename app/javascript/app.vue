@@ -1,87 +1,58 @@
 <template>
   <draggable
-    class="row dragArea"
+    class="board dragArea"
     :list="objectives"
     :options="{ group: 'objectives' }"
-    @end="listMoved"
+    @end="objectiveMoved"
   >
-    <div
+    <objective
       v-for="(objective, index) in originalObjectives"
+      :objective=objective
       :key="objective.id"
-      class="col-3"
-    >
-      <h6>{{ objective.name }}</h6>
-      <hr>
+    />
 
-      <draggable
-        v-model="objective.tasks"
-        :options="{ group: 'cards' }"
-        class="dragArea"
-        @change="cardMoved"
+    <div class="objective">
+      <a v-if="!editing" @click="startEditing">Add an Objective</a>
+
+      <textarea
+        v-if="editing"
+        class="form-control mb-1"
+        v-model="message"
+        ref="message"
       >
-        <div
-          v-for="(task, index) in objective.tasks"
-          :key="task.id"
-          class="card card-body mb-3"
-        >
-          {{ task.name }}
-        </div>
-      </draggable>
+      </textarea>
 
-      <div class="card card-body">
-        <textarea class="form-control"
-          v-model="messages[objective.id]"
-          ></textarea>
+      <button v-if="editing" class="btn btn-secondary" @click="submitMessage">
+        Add
+      </button>
 
-        <button
-          class="btn btn-secondary"
-          @click="submitMessages(objective.id)"
-        >
-          Add
-        </button>
-      </div>
+      <a v-if="editing" @click="editing = false">Cancel</a>
     </div>
   </draggable>
 </template>
 
 <script>
 import draggable from "vuedraggable";
+import objective from "./components/objective";
 
 export default {
-  components: {
-    draggable,
-  },
+  components: { draggable, objective },
   props: {
-    originalObjectives: {
-      type: Array,
-      default: []
-    },
+    originalObjectives: { type: Array, default: [] },
   },
   data() {
     return {
-      messages: {},
-      objectives: this.originalObjectives
+      objectives: this.originalObjectives,
+      editing: false,
+      message: '',
     }
   },
   methods: {
-    submitMessages(objectiveId) {
-      var data = new FormData
-      data.append("task[objective_id]", objectiveId)
-      data.append("task[name]", this.messages[objectiveId])
-
-      Rails.ajax({
-        url: "/tasks",
-        type: "POST",
-        data,
-        dataType: "json",
-        success: (data) => {
-          const index = this.objectives.findIndex(item => item.id == objectiveId)
-          this.objectives[index].tasks.push(data)
-          this.messages[objectiveId] = undefined
-        }
-      })
+    startEditing(){
+      this.editing = true
+      this.$nextTick(() => this.$refs.message.focus())
     },
-    listMoved (event) {
+    objectiveMoved (event) {
       var data = new FormData
       data.append("objective[position]", event.newIndex + 1)
 
@@ -92,28 +63,21 @@ export default {
         dataType: "json",
       })
     },
-    cardMoved (event) {
-      console.log(event);
-
-      if (event.added == undefined) { return }
-
-      const objectiveIndex = this.objectives.findIndex(objective => {
-        return objective.tasks.find(task => {
-          task.id == event.added.newIndex
-        })
-      })
-
-      console.log(objectiveIndex);
-
+    submitMessage() {
       var data = new FormData
-      data.append("objective[position]", event.newIndex + 1)
+      data.append("objective[name]", this.message)
 
-      // Rails.ajax({
-      //   url: `/objectives/${this.objectives[event.newIndex].id}/move`,
-      //   type: "PATCH",
-      //   data,
-      //   dataType: "json",
-      // })
+      Rails.ajax({
+        url: "/objectives",
+        type: "POST",
+        data,
+        dataType: "json",
+        success: (data) => {
+          window.store.objectives.push(data)
+          this.message = ''
+          this.editing = false
+        }
+      })
     },
   }
 }
@@ -127,5 +91,20 @@ export default {
 
   .dragArea {
     min-height: 10px;
+  }
+
+  .board {
+    white-space: nowrap;
+    overflow-x: auto;
+  }
+
+  .objective {
+    background: #E2E4E6;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 20px;
+    padding: 10px;
+    vertical-align: top;
+    width: 270px;
   }
 </style>

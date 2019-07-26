@@ -5,7 +5,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :tasks
+  resources :tasks do
+    member do
+      patch :move
+    end
+  end
 
   devise_for :users
   root to: 'objectives#index'
