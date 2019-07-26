@@ -1,9 +1,21 @@
 import "bootstrap";
 
 import Vue from 'vue/dist/vue.esm'
+import Vuex from 'vuex'
 import App from "../app.vue";
 
-window.store = {}
+Vue.use(Vuex)
+
+window.store = new Vuex.Store({
+  state: {
+    objectives: [],
+  },
+  mutations: {
+    addObjective(state, data) {},
+    addTask(state, data) {},
+    editTask(state, data) {},
+  }
+})
 
 document.addEventListener("DOMContentLoaded", function (event) {
   var el = document.querySelector('#boards')
@@ -12,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     new Vue({
       el,
-      data: window.store,
+      store: window.store,
       template: "<App :originalObjectives='objectives' />",
       components: { App }
     })
