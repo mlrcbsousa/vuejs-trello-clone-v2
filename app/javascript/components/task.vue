@@ -66,12 +66,7 @@
           data,
           dataType: "json",
           success: (data) => {
-            const objectives = window.store.objectives
-            const objectiveIndex = objectives.findIndex(({ id }) => id === this.objectiveId)
-            const taskIndex = objectives[objectiveIndex].tasks.findIndex(({ id }) => id === this.task.id)
-
-            objectives[objectiveIndex].tasks.splice(taskIndex, 1, data)
-
+            this.$store.commit('editTask', data)
             this.editing = false
           }
         })

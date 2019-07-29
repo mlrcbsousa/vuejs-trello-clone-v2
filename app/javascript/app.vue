@@ -6,7 +6,7 @@
     @end="objectiveMoved"
   >
     <objective
-      v-for="(objective, index) in originalObjectives"
+      v-for="(objective, index) in objectives"
       :objective=objective
       :key="objective.id"
     />
@@ -22,7 +22,7 @@
       >
       </textarea>
 
-      <button v-if="editing" class="btn btn-secondary" @click="submitMessage">
+      <button v-if="editing" class="btn btn-secondary" @click="createObjective">
         Add
       </button>
 
@@ -37,16 +37,20 @@ import objective from "./components/objective";
 
 export default {
   components: { draggable, objective },
-  props: {
-    originalObjectives: { type: Array, default: [] },
-  },
+
   data() {
     return {
-      objectives: this.originalObjectives,
       editing: false,
       message: '',
     }
   },
+
+  computed: {
+    objectives () {
+      return this.$store.state.objectives
+    },
+  },
+
   methods: {
     startEditing(){
       this.editing = true
@@ -63,7 +67,7 @@ export default {
         dataType: "json",
       })
     },
-    submitMessage() {
+    createObjective() {
       var data = new FormData
       data.append("objective[name]", this.message)
 
@@ -73,7 +77,7 @@ export default {
         data,
         dataType: "json",
         success: (data) => {
-          window.store.objectives.push(data)
+          this.$store.commit('addObjective', data)
           this.message = ''
           this.editing = false
         }

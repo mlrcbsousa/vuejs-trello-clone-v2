@@ -20,7 +20,7 @@
       ref="message"
     >
     </textarea>
-    <button v-if="editing" class="btn btn-secondary" @click="submitMessage">
+    <button v-if="editing" class="btn btn-secondary" @click="createTask">
       Add
     </button>
     <a v-if="editing" @click="editing = false">Cancel</a>
@@ -48,7 +48,7 @@ import task from "./task";
         this.editing = true
         this.$nextTick(() => this.$refs.message.focus())
       },
-      submitMessage() {
+      createTask() {
         const objectiveId = this.objective.id
 
         var data = new FormData
@@ -61,8 +61,7 @@ import task from "./task";
           data,
           dataType: "json",
           success: (data) => {
-            const index = window.store.objectives.findIndex(item => item.id == objectiveId)
-            window.store.objectives[index].tasks.push(data)
+            this.$store.commit('addTask', data)
             this.message = ''
             this.$nextTick(() => this.$refs.message.focus())
           }
