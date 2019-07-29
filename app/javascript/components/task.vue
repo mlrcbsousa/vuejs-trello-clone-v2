@@ -66,7 +66,7 @@
           data,
           dataType: "json",
           success: (data) => {
-            this.$store.commit('editTask', data)
+            // this.$store.commit('editTask', data)
             this.editing = false
           }
         })

@@ -28,6 +28,13 @@ class TasksController < ApplicationController
 
     respond_to do |format|
       if @task.save
+        ActionCable.server.broadcast('board',
+          {
+            commit: 'addTask',
+            payload: render_to_string(:show, format: :json)
+          }
+        )
+
         format.html { redirect_to @task, notice: 'Task was successfully created.' }
         format.json { render :show, status: :created, location: @task }
       else
@@ -42,6 +49,13 @@ class TasksController < ApplicationController
   def update
     respond_to do |format|
       if @task.update(task_params)
+        ActionCable.server.broadcast('board',
+          {
+            commit: 'editTask',
+            payload: render_to_string(:show, format: :json)
+          }
+        )
+
         format.html { redirect_to @task, notice: 'Task was successfully updated.' }
         format.json { render :show, status: :ok, location: @task }
       else

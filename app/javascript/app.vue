@@ -77,7 +77,7 @@ export default {
         data,
         dataType: "json",
         success: (data) => {
-          this.$store.commit('addObjective', data)
+          // action cable adds to store
           this.message = ''
           this.editing = false
         }

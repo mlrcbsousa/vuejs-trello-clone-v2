@@ -61,7 +61,7 @@ import task from "./task";
           data,
           dataType: "json",
           success: (data) => {
-            this.$store.commit('addTask', data)
+            // this.$store.commit('addTask', data)
             this.message = ''
             this.$nextTick(() => this.$refs.message.focus())
           }
@@ -73,12 +73,12 @@ import task from "./task";
 
         const { element, newIndex } = event
 
-        const objectiveIndex = window.store.objectives.findIndex(objective => {
+        const objectiveIndex = this.$store.state.objectives.findIndex(objective => {
           return objective.tasks.find(({ id }) => id === element.id)
         })
 
         var data = new FormData
-        data.append("task[objective_id]", window.store.objectives[objectiveIndex].id)
+        data.append("task[objective_id]", this.$store.state.objectives[objectiveIndex].id)
         data.append("task[position]", newIndex + 1)
 
         Rails.ajax({

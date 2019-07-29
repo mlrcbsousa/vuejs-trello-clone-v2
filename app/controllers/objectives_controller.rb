@@ -28,7 +28,12 @@ class ObjectivesController < ApplicationController
 
     respond_to do |format|
       if @objective.save
-        ActionCable.server.broadcast 'board', { commit: 'addObjective', payload: render_to_string(:show, format: :json) }
+        ActionCable.server.broadcast('board',
+          {
+            commit: 'addObjective',
+            payload: render_to_string(:show, format: :json)
+          }
+        )
 
         format.html { redirect_to @objective, notice: 'Objective was successfully created.' }
         format.json { render :show, status: :created, location: @objective }
